@@ -24,7 +24,9 @@ if (fs.existsSync(settings.tokenFile)) {
         },
         {
             title: `uploading ${tarball} to Google Drive`,
-            task: async () => await drive.uploadFile(tarball)
+            task: async () => {
+                await drive.uploadFile(tarball);
+            }
         }
     ]).run();
 } else {

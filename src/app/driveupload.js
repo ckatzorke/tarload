@@ -1,6 +1,7 @@
 const SETTINGS = require('./settings.js');
 
 const fs = require('fs');
+const path = require('path');
 
 const readline = require('readline');
 const {
@@ -29,19 +30,22 @@ uploadFile = async (fileName) => {
             version: 'v3',
             auth: auth
         });
+        const googleName = fileName.substring(fileName.lastIndexOf(path.sep)  + 1)
         const res = await drive.files.create({
             resource: {
-                name: fileName.substring(fileName.lastIndexOf('/')  + 1)
+                name: googleName
             },
             requestBody: {
                 // a requestBody element is required if you want to use multipart
+                mimeType: 'application/gzip',
+                name: googleName
             },
             media: {
                 mimeType: 'application/gzip',
                 body: fs.createReadStream(fileName)
             }
         });
-        console.log("RES", res);
+        return res;
     });
 }
 
