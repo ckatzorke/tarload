@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/ckatzorke/tarload#readme",
   "dependencies": {
-    "googleapis": "^32.0.0"
+    "execa": "^0.10.0",
+    "googleapis": "^32.0.0",
+    "listr": "^0.14.1"
   }
 }

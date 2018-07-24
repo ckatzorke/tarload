@@ -22,8 +22,27 @@ setupCredentials = () => {
 /**
  * Triggers the upload
  */
-uploadFile = (file) => {
-    authorize(listFiles);
+uploadFile = async (fileName) => {
+    await authorize(async (auth) => {
+        const fileSize = fs.statSync(fileName).size;
+        const drive = google.drive({
+            version: 'v3',
+            auth: auth
+        });
+        const res = await drive.files.create({
+            resource: {
+                name: fileName.substring(fileName.lastIndexOf('/')  + 1)
+            },
+            requestBody: {
+                // a requestBody element is required if you want to use multipart
+            },
+            media: {
+                mimeType: 'application/gzip',
+                body: fs.createReadStream(fileName)
+            }
+        });
+        console.log("RES", res);
+    });
 }
 
 /**
@@ -31,7 +50,7 @@ uploadFile = (file) => {
  * given callback function.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(callback) {
+async function authorize(callback) {
     // Load client secrets from a local file.
     fs.readFile(SETTINGS.clientSecretFile, (err, content) => {
         if (err) return console.log('Error loading client secret file:', err);
@@ -84,31 +103,7 @@ function getAccessToken(oAuth2Client, callback) {
     });
 }
 
-/**
- * Lists the names and IDs of up to 10 files.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-function listFiles(auth) {
-    const drive = google.drive({
-        version: 'v3',
-        auth
-    });
-    drive.files.list({
-        pageSize: 10,
-        fields: 'nextPageToken, files(id, name)',
-    }, (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err);
-        const files = res.data.files;
-        if (files.length) {
-            console.log('Files:');
-            files.map((file) => {
-                console.log(`${file.name} (${file.id})`);
-            });
-        } else {
-            console.log('No files found.');
-        }
-    });
-}
+
 /**
  * Siple callback that is triggered when the initial authentication has happened
  */

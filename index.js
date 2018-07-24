@@ -1,12 +1,32 @@
 #!/usr/bin/env node
 
-let fs = require('fs');
+const fs = require('fs');
+const tmpdir = require('os').tmpdir();
+const execa = require('execa');
+const Listr = require('listr');
 
-let drive = require('./src/app/driveupload.js');
-let settings = require('./src/app/settings.js');
+
+const drive = require('./src/app/driveupload.js');
+const settings = require('./src/app/settings.js');
 
 if (fs.existsSync(settings.tokenFile)) {
-    drive.uploadFile('test');
+    const tarball = `${tmpdir}/backup-test.tar.gz`;
+    const packfolder = `${settings.tarfolder}`;
+    new Listr([{
+            title: `tarballing ${packfolder} to ${tarball}`,
+            task: () => {
+                execa('tar', ['czf', tarball, packfolder]);
+            }
+        },
+        {
+            title: `hatschipüh`,
+            task: () => execa('sleep', ['3'])
+        },
+        {
+            title: `uploading ${tarball} to Google Drive`,
+            task: async () => await drive.uploadFile(tarball)
+        }
+    ]).run();
 } else {
     console.warn('No Google Drive authorization happened yet. Please login and give your consent...');
     drive.setupCredentials();
