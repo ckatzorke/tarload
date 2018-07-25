@@ -1,5 +1,16 @@
 const home = require('os').homedir();
-module.exports.tarfolder = '/mnt/e/ebay';
-module.exports.homefolder = `${home}/.tarload/`;
-module.exports.clientSecretFile = `${home}/.tarload/client_secret.json`;
-module.exports.tokenFile = `${home}/.tarload/credentials.json`;
+const fs = require('fs');
+
+const homefolder = `${home}/.tarload`;
+const configFile = `${home}/.tarload/config.json`;
+
+
+const content = fs.readFileSync(configFile);
+const config = JSON.parse(content);
+
+module.exports.tarfolder = config.folder;
+module.exports.tarname = config.tarname;
+module.exports.homefolder = homefolder;
+module.exports.configFile = configFile;
+module.exports.clientSecretFile = `${homefolder}/client_secret.json`;
+module.exports.tokenFile = `${homefolder}/credentials.json`;

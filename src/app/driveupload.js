@@ -30,15 +30,14 @@ uploadFile = async (fileName) => {
             version: 'v3',
             auth: auth
         });
-        const googleName = fileName.substring(fileName.lastIndexOf(path.sep)  + 1)
         const res = await drive.files.create({
             resource: {
-                name: googleName
+                name: SETTINGS.tarname
             },
             requestBody: {
                 // a requestBody element is required if you want to use multipart
                 mimeType: 'application/gzip',
-                name: googleName
+                name: SETTINGS.tarname
             },
             media: {
                 mimeType: 'application/gzip',
