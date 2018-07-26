@@ -4,8 +4,12 @@ const fs = require('fs');
 const homefolder = `${home}/.tarload`;
 const configFile = `${home}/.tarload/config.json`;
 
-
-const content = fs.readFileSync(configFile);
+let content = "{}";
+try {
+    content = fs.readFileSync(configFile);
+} catch(error){
+    //file not available...
+}
 const config = JSON.parse(content);
 
 module.exports.tarfolder = config.folder;

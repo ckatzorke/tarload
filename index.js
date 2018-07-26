@@ -36,8 +36,13 @@ const tarball = `${tmpdir}/${settings.tarname}`;
 const packfolder = `${settings.tarfolder}`;
 new Listr([{
         title: `tarballing ${packfolder} to ${tarball}`,
-        task: async () => {
-            await execa('tar', ['czf', tarball, packfolder]).then(() => console.log('tar finished'));
+        task: async (ctx, task) => {
+            try {
+                await execa('tar', ['czf', tarball, packfolder]);
+            }catch(error){
+
+                task.skip('Error creating tarball!');
+            }
         }
     },
     {
@@ -45,16 +50,16 @@ new Listr([{
         task: async (ctx, task) => {
             try {
                 await drive.uploadFile(tarball);
-                console.log('upload finished');
             } catch (error) {
                 task.skip('Uploading failed...');
             }
         }
-    }/*,
-    {
-        title: `Cleaning up (removing ${tarball}`,
-        task: () => {
-            execa('rm', [tarball]).then(() => console.log('rm finished'));
-        }
-    }*/
-]).run();
+    }
+    /*,
+        {
+            title: `Cleaning up (removing ${tarball}`,
+            task: () => {
+                execa('rm', [tarball]).then(() => console.log('rm finished'));
+            }
+        }*/
+]).run().catch(error => console.log('An error occured', error));
